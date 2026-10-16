@@ -9,7 +9,7 @@
     <title>Easin — Code · Craft · AI</title>
     <link rel="shortcut icon" href="icon_logo.png" type="image/png">
     <link rel="icon" href="icon_logo.png" type="image/png">
-    <link rel="stylesheet" href="css/easin.css?v=20260914">
+    <link rel="stylesheet" href="css/easin.css?v=20261015">
 </head>
 
 <body>
@@ -53,8 +53,15 @@
         <!-- ===== Works 时间线作品（Résumé + Works 合并，标题可点击跳转） ===== -->
         <section class="s-block" id="works">
             <h2>Works</h2>
+            <div class="tl-filter" id="tl-filter">
+                <button class="tl-btn is-active" data-filter="all">全部</button>
+                <button class="tl-btn" data-filter="blog">博客</button>
+                <button class="tl-btn" data-filter="work">作品与工具</button>
+                <button class="tl-btn" data-filter="milestone">里程碑</button>
+                <button class="tl-btn" data-filter="about">关于</button>
+            </div>
 
-            <article class="entry">
+            <article class="entry" data-cat="about">
                 <div class="entry-years">2026 — Now</div>
                 <div class="entry-body">
                     <h3><a href="https://sj.qq.com/appdetail/com.stock.universe" target="_blank" rel="noopener">股宇宙 APP · Android Engineer</a></h3>
@@ -63,7 +70,7 @@
                 </div>
             </article>
 
-            <article class="entry">
+            <article class="entry" data-cat="work">
                 <div class="entry-years">2026.10</div>
                 <div class="entry-body">
                     <h3><a href="article-anime-museum.html">经典动漫人物博物馆：数百位经典角色、五座年代展厅与会流光的全息闪卡</a></h3>
@@ -73,7 +80,7 @@
                 </div>
             </article>
 
-            <article class="entry">
+            <article class="entry" data-cat="blog">
                 <div class="entry-years">2026.10</div>
                 <div class="entry-body">
                     <h3><a href="https://bayshier.github.io/GYZApp/blog-resinisland.html">AI 画了一张"树脂岛屿"，我用 Three.js 把它变成活的</a></h3>
@@ -82,7 +89,7 @@
                 </div>
             </article>
 
-            <article class="entry">
+            <article class="entry" data-cat="blog">
                 <div class="entry-years">2026.10</div>
                 <div class="entry-body">
                     <h3><a href="https://bayshier.github.io/GYZApp/blog-openstock.html">行情、资讯、AI 摘要，一个开源平台全包了：OpenStock 汉化与自部署</a></h3>
@@ -91,7 +98,45 @@
                 </div>
             </article>
 
-            <article class="entry">
+            <article class="entry" data-cat="blog">
+                <div class="entry-years">2026.09</div>
+                <div class="entry-body">
+                    <h3><a href="https://bayshier.github.io/GYZApp/blog-pelican-isle.html" target="_blank" rel="noopener">鹈鹕环岛记：把一道 AI 考题造成一个世界</a></h3>
+                    <div class="entry-tag">Blog · Three.js × 程序化生成</div>
+                    <p>把「鹈鹕骑自行车」这道文生图考题做成 3D 小世界：环岛骑行、程序化地形与物理彩蛋，让 AI 的答案可以进去玩。</p>
+                </div>
+            </article>
+
+
+            <article class="entry" data-cat="blog">
+                <div class="entry-years">2026.10</div>
+                <div class="entry-body">
+                    <h3><a href="https://bayshier.github.io/GYZApp/blog-agent-codeintel.html" target="_blank" rel="noopener">Agent 的代码理解基建（一）：别让 AI 花你的 token 重新发现你的代码库</a></h3>
+                    <div class="entry-tag">Blog · Repowise × 代码索引</div>
+                    <p>Repowise 在两个 Kotlin 仓库实测：9.97 / 9.82 健康分、零 API key；grep / RAG / 索引三层对比，以及为什么这是基建而不是又一个工具。</p>
+                </div>
+            </article>
+
+            <article class="entry" data-cat="blog">
+                <div class="entry-years">2026.10</div>
+                <div class="entry-body">
+                    <h3><a href="https://bayshier.github.io/GYZApp/blog-agent-harness.html" target="_blank" rel="noopener">Agent 的代码理解基建（二）：Harness 五组件与一场沙箱葬礼</a></h3>
+                    <div class="entry-tag">Blog · Harness × Sandbox</div>
+                    <p>Kotlin 五组件参考实现：OODA + 预算护栏（15× token 是一等旋钮）、任务 DAG、deny-then-escalate——附 macOS 26 sandbox-exec 讣告（实测）。</p>
+                </div>
+            </article>
+
+            <article class="entry" data-cat="blog">
+                <div class="entry-years">2026.10</div>
+                <div class="entry-body">
+                    <h3><a href="https://bayshier.github.io/GYZApp/blog-agent-skill-evolution.html" target="_blank" rel="noopener">Agent 的代码理解基建（三）：技能自进化，git 是那块缺失的拼图</a></h3>
+                    <div class="entry-tag">Blog · 系列完结 · 自进化</div>
+                    <p>观察→本能→eval 门控→git 提交→可回滚：24 万★项目缺的版本管理，91★ 小仓库反而有。Karpathy 的警告：过度过滤会杀死自我改进。</p>
+                </div>
+            </article>
+
+
+            <article class="entry" data-cat="blog">
                 <div class="entry-years">2026.09</div>
                 <div class="entry-body">
                     <h3><a href="https://bayshier.github.io/GYZApp/blog-floorplan-web.html">当我给装修设计工具换上 AI 素材，它变成了娃娃屋</a></h3>
@@ -100,7 +145,7 @@
                 </div>
             </article>
 
-            <article class="entry">
+            <article class="entry" data-cat="blog">
                 <div class="entry-years">2026.09</div>
                 <div class="entry-body">
                     <h3><a href="https://bayshier.github.io/GYZApp/blog-destroy-web.html">粉碎任意网页：把整个互联网变成射击关卡</a></h3>
@@ -109,7 +154,7 @@
                 </div>
             </article>
 
-            <article class="entry">
+            <article class="entry" data-cat="blog">
                 <div class="entry-years">2026.09</div>
                 <div class="entry-body">
                     <h3><a href="https://bayshier.github.io/GYZApp/blog-nikki-match3.html">从消消乐到游戏合集：Nikki 猫宇宙开发实录</a></h3>
@@ -118,7 +163,7 @@
                 </div>
             </article>
 
-            <article class="entry">
+            <article class="entry" data-cat="milestone">
                 <div class="entry-years">2026.09</div>
                 <div class="entry-body">
                     <h3>一周烧掉 40 亿 Token 🤯</h3>
@@ -128,7 +173,7 @@
                 </div>
             </article>
 
-            <article class="entry">
+            <article class="entry" data-cat="blog">
                 <div class="entry-years">2026.09</div>
                 <div class="entry-body">
                     <h3><a href="https://bayshier.github.io/GYZApp/blog-jenkins-harmony.html">一条流水线，两个系统：双端自动化打包实录</a></h3>
@@ -137,7 +182,7 @@
                 </div>
             </article>
 
-            <article class="entry">
+            <article class="entry" data-cat="blog">
                 <div class="entry-years">2026.09</div>
                 <div class="entry-body">
                     <h3><a href="https://bayshier.github.io/GYZApp/blog-jenkins-notify.html">Jenkins 打包通知体系搭建实录</a></h3>
@@ -146,7 +191,17 @@
                 </div>
             </article>
 
-            <article class="entry">
+            <article class="entry" data-cat="blog">
+                <div class="entry-years">2026.08</div>
+                <div class="entry-body">
+                    <h3><a href="https://bayshier.github.io/GYZApp/blog-pelican-bicycle.html" target="_blank" rel="noopener">鹈鹕骑自行车测试：9 个国产模型横评</a></h3>
+                    <div class="entry-tag">Blog · 文生图 × 横评</div>
+                    <p>一道文生图考题的横向评测：谁画对了鹈鹕、自行车与物理？文末新增第七章续作《鹈鹕环岛记》3D 游戏。</p>
+                </div>
+            </article>
+
+
+            <article class="entry" data-cat="work">
                 <div class="entry-years">2026.08</div>
                 <div class="entry-body">
                     <h3><a href="https://bayshier.github.io/GYZApp/quiz.html">证券从业考试学习系统</a></h3>
@@ -155,7 +210,7 @@
                 </div>
             </article>
 
-            <article class="entry">
+            <article class="entry" data-cat="blog">
                 <div class="entry-years">2026.08</div>
                 <div class="entry-body">
                     <h3><a href="https://bayshier.github.io/GYZApp/blog-harness-engineering.html">Harness Engineering：企业级多Agent协同实战</a></h3>
@@ -164,7 +219,7 @@
                 </div>
             </article>
 
-            <article class="entry">
+            <article class="entry" data-cat="blog">
                 <div class="entry-years">2026.08</div>
                 <div class="entry-body">
                     <h3><a href="https://bayshier.github.io/GYZApp/blog-kline-vision.html">宇树腰斩这4天，我让 AI 读了读它的K线——它回了四个字：瀑布线</a></h3>
@@ -173,7 +228,7 @@
                 </div>
             </article>
 
-            <article class="entry">
+            <article class="entry" data-cat="blog">
                 <div class="entry-years">2026.08</div>
                 <div class="entry-body">
                     <h3><a href="https://bayshier.github.io/GYZApp/blog-kotlin-mcp.html">我给 AI 写了两个 Kotlin MCP 服务器</a></h3>
@@ -182,7 +237,7 @@
                 </div>
             </article>
 
-            <article class="entry">
+            <article class="entry" data-cat="work">
                 <div class="entry-years">2026.07</div>
                 <div class="entry-body">
                     <h3><a href="https://bayshier.github.io/GYZApp/knowledge.html">股宇宙知识库</a></h3>
@@ -191,7 +246,7 @@
                 </div>
             </article>
 
-            <article class="entry">
+            <article class="entry" data-cat="work">
                 <div class="entry-years">2026.07</div>
                 <div class="entry-body">
                     <h3><a href="https://bayshier.github.io/GYZApp/cfzx2027.html" target="_blank" rel="noopener">财富在线 27 周年庆</a></h3>
@@ -200,7 +255,7 @@
                 </div>
             </article>
 
-            <article class="entry">
+            <article class="entry" data-cat="about">
                 <div class="entry-years">2026</div>
                 <div class="entry-body">
                     <h3><a href="https://github.com/bayshier" target="_blank" rel="noopener">GitHub 开源</a></h3>
@@ -208,6 +263,10 @@
                     <p>kline-mcp、android-mcp、android-agent-skills、Compose-MVI-KLine——个人开源项目与代码仓库，持续更新中。</p>
                 </div>
             </article>
+
+            <div class="tl-more-wrap">
+                <button class="tl-more" id="tl-more">展开全部 <span id="tl-more-count"></span> ↓</button>
+            </div>
         </section>
 
         <!-- ===== Contact ===== -->
@@ -229,6 +288,7 @@
 
     <!-- 黑客帝国数字雨 -->
     <script src="js/matrix-rain.js"></script>
+    <script src="js/timeline.js"></script>
 
     <!-- Logo 星球 3D 旋转 -->
     <script>

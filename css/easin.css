@@ -448,3 +448,30 @@ body::before {
     transition: transform 0.2s;
 }
 .entry-body .entry-img:hover { transform: translateY(-2px); }
+
+
+/* ============================================================
+   时间线筛选与折叠
+   ============================================================ */
+.tl-filter {
+    display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0 30px;
+}
+.tl-btn {
+    font-family: var(--serif-cn); font-size: 12px; letter-spacing: .12em;
+    color: var(--ink-dim); background: var(--bg-elev);
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 6px 16px; cursor: pointer; transition: all .18s;
+}
+.tl-btn:hover { color: var(--ink); border-color: rgba(244, 241, 234, .4); }
+.tl-btn.is-active {
+    color: #0a0e16; background: var(--accent); border-color: var(--accent); font-weight: 700;
+}
+.entry.tl-hidden { display: none; }
+.tl-more-wrap { text-align: center; margin-top: 34px; }
+.tl-more {
+    font-family: var(--serif-cn); font-size: 13px; letter-spacing: .14em;
+    color: var(--ink); background: transparent;
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 10px 30px; cursor: pointer; transition: all .18s;
+}
+.tl-more:hover { border-color: var(--accent); color: var(--accent); }
