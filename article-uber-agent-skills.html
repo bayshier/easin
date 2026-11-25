@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uber 每月 100 万次 Agent Skill 调用是怎么评估的 — Easin</title>
+    <meta name="description" content="Uber 工程团队公开了他们的企业级 Agent Skill 体系：一年 5000 多个技能、单月调用超 100 万次。一篇带原文链接的解读。">
+    <link rel="stylesheet" href="css/easin.css?v=20260914">
+    <style>
+        .back-link {
+            display: inline-block; margin: 46px 0 34px;
+            font-size: 13px; letter-spacing: .14em; color: var(--ink-dim);
+            text-decoration: none; transition: color .2s;
+        }
+        .back-link:hover { color: var(--accent); }
+
+        .article-head .entry-tag {
+            font-size: 12px; letter-spacing: .22em; color: var(--accent);
+            margin-bottom: 18px;
+        }
+        .article-head h1 {
+            font-size: clamp(26px, 4.6vw, 40px); font-weight: 800; line-height: 1.4;
+            letter-spacing: .01em; margin-bottom: 16px;
+        }
+        .article-head .article-lead {
+            color: var(--ink-dim); font-size: 15px; line-height: 1.9; margin-bottom: 30px;
+        }
+
+        .article-body { max-width: 720px; }
+        .article-body h2 {
+            font-size: 21px; font-weight: 800; margin: 46px 0 14px; letter-spacing: .02em;
+        }
+        .article-body h2::before { content: "§ "; color: var(--accent); }
+        .article-body p { color: rgba(244, 241, 234, 0.82); font-size: 15px; line-height: 1.95; margin-bottom: 16px; }
+        .article-body a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(61, 220, 132, .35); }
+        .article-body a:hover { border-bottom-color: var(--accent); }
+        .article-body ul { margin: 0 0 18px 4px; list-style: none; }
+        .article-body ul li {
+            color: rgba(244, 241, 234, 0.82); font-size: 15px; line-height: 1.9;
+            padding-left: 22px; position: relative; margin-bottom: 8px;
+        }
+        .article-body ul li::before { content: "◆"; position: absolute; left: 0; top: 1px; font-size: 10px; color: var(--accent); }
+        .article-body code {
+            font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+            background: var(--bg-elev); border: 1px solid var(--line);
+            border-radius: 5px; padding: 1px 7px; color: var(--ink);
+        }
+        .article-body strong { color: var(--ink); }
+
+        /* 引用原文时的来源框 */
+        .src-box {
+            border: 1px solid var(--line); border-left: 3px solid var(--accent);
+            border-radius: 10px; padding: 16px 20px; margin: 0 0 30px;
+            background: var(--bg-elev); font-size: 14px; line-height: 1.85; color: var(--ink);
+        }
+        .src-box .k { color: var(--ink-dim); font-size: 12px; letter-spacing: .14em; display: block; margin-bottom: 6px; }
+
+        /* 数据卡 */
+        .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 6px 0 26px; }
+        .stat { border: 1px solid var(--line); border-radius: 12px; padding: 14px 14px 12px; background: var(--bg-elev); }
+        .stat b { display: block; font-size: 24px; font-weight: 800; letter-spacing: .01em; color: var(--ink); line-height: 1.2; }
+        .stat span { display: block; margin-top: 6px; font-size: 12px; color: var(--ink-dim); line-height: 1.5; }
+
+        /* 对照表 */
+        .cmp { border-collapse: collapse; margin: 8px 0 24px; font-size: 14px; }
+        .cmp th, .cmp td { border: 1px solid var(--line); padding: 9px 11px; text-align: left; vertical-align: top; line-height: 1.7; }
+        .cmp th { background: var(--bg-elev); color: var(--ink); font-weight: 700; white-space: nowrap; }
+        .cmp td:first-child { color: var(--ink); font-weight: 700; white-space: nowrap; }
+        .cmp td { color: rgba(244, 241, 234, 0.82); min-width: 150px; }
+
+        .article-cta { display: flex; gap: 14px; flex-wrap: wrap; margin: 44px 0 10px; }
+        .article-cta a {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 14px; font-weight: 700; letter-spacing: .06em;
+            color: #0a0e16; background: var(--accent); text-decoration: none;
+            padding: 12px 26px; border-radius: 999px; transition: transform .18s, filter .18s;
+        }
+        .article-cta a:hover { transform: translateY(-2px); filter: brightness(1.08); }
+        .article-cta a.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+        .article-cta a.ghost:hover { border-color: var(--accent); color: var(--accent); filter: none; }
+
+        .article-foot {
+            margin-top: 52px; padding-top: 22px; border-top: 1px dashed var(--line);
+            font-size: 12px; color: var(--ink-faint); line-height: 1.9;
+        }
+        /* 对照表：窄屏时由外层容器横向滚动（表格本身不滚动） */
+        .cmp-wrap { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 8px 0 24px; }
+        .cmp { margin: 0; }
+        .cmp-hint { display: none; font-size: 12px; color: var(--ink-faint); margin: -16px 0 18px; letter-spacing: .04em; }
+        @media (max-width: 600px) {
+            .back-link { margin-top: 30px; }
+            .stat-row { grid-template-columns: 1fr; }
+            .cmp-hint { display: block; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix-rain"></canvas>
+
+    <main class="page" style="padding-bottom: 80px;">
+        <a class="back-link" href="./">← 返回主页 · BACK HOME</a>
+
+        <header class="article-head">
+            <div class="entry-tag">2026.11 · AI ENGINEERING × AGENT SKILLS</div>
+            <h1>Uber 每月 100 万次 Agent Skill 调用，是怎么评估的</h1>
+            <p class="article-lead">一个技能一年长到 5000 多个之后，问题就从「怎么写」变成了「怎么知道它好不好」。Uber 工程团队公开了他们的做法。这是我的解读，不是全文翻译。</p>
+        </header>
+
+        <div class="article-body">
+            <div class="src-box">
+                <span class="k">原文</span>
+                <a href="https://www.uber.com/us/en/blog/optimizing-ubers-agent-skills/" target="_blank" rel="noopener">How Uber Evals 1 Million Agent Skill Invocations a Month</a>（Uber Engineering，2026 年 11 月 23 日）·
+                <a href="https://x.com/UberEng/status/2125008806249930999" target="_blank" rel="noopener">X 上的发布贴 ↗</a>
+            </div>
+
+            <h2>先看数字</h2>
+            <p>原文开篇给了三个数，是整篇文章的出发点：</p>
+            <div class="stat-row">
+                <div class="stat"><b>1 → 5,000+</b><span>共享技能市场里的技能数，2025 年 10 月到一年后</span></div>
+                <div class="stat"><b>100 万+</b><span>单月 agent 调用技能的次数</span></div>
+                <div class="stat"><b>12 项</b><span>为每个技能计算的指标，含用户数、留存、成本、延迟、错误</span></div>
+            </div>
+            <p>我更在意的是作者在文末说的那句话的重心变化：<strong>用量上来、模型变强之后，他们的焦点已经从「写技能」转到了「技能的质量与评估」</strong>。下面挑我觉得最有信息量的四块来讲。</p>
+
+            <h2>一、评估集的配比：5 / 80 / 15</h2>
+            <p>Uber 给技能做评估，不靠用户人工反馈。他们的评估集有明确的构成：</p>
+            <ul>
+                <li><strong>约 5% 黄金用例</strong>：输入固定、输出可预期、工具用 mock。</li>
+                <li><strong>80% 真实 prompt，按轨迹打分</strong>。轨迹看的是 agent 有没有按正确顺序用了正确的技能和工具，不看最终结果。</li>
+                <li><strong>15% 由作者判断</strong>。</li>
+            </ul>
+            <p>有两个说法和常见直觉相反，值得记下来。一是<strong>通过率 70% 到 90% 的评估，可能比 100% 通过的更有用</strong>：答案会变，裁判也会变；满分往往意味着这个评估没捕捉到答案里有意义的变化。二是评估必须在<strong>干净环境</strong>里跑（他们用了后台 agent 平台、托管沙箱和远程开发机三种），因为干净环境能揪出那些「在我机器上是好的」的依赖——有的技能需要特定文件路径、缓存过的文档或特定系统的工具才能工作。</p>
+
+            <h2>二、消融实验：把技能拿掉，看答案会不会变差</h2>
+            <p>这是我认为最可直接借鉴的方法。对同一个技能，把真实 prompt 回放两次，一次带技能、一次不带，让一个不知情的裁判选更好的答案。</p>
+            <p>原文给的例子是数据仓库查询技能：不带技能的会话多发了 13% 的工具调用，工具错误多出六倍，耗时多出 31%；带技能的答案在 87% 的对比中胜出。</p>
+            <p>结论是<strong>少有时反而是多</strong>。模型越强，技能里多出来的文字越可能拖累表现，所以他们也会测试从技能里删词。作者同时说得很清楚：收益最大的是那些给了 agent 它原本找不到的东西的技能，比如访问内部文档的途径。</p>
+
+            <h2>三、Code Mode：超过 100 个工具时，光定义就吃掉五到七万 token</h2>
+            <p>LLM 客户端默认的 MCP 安装方式，会把每个工具的完整描述塞进每一次调用。原文说工具超过 100 个时，<strong>用户还没打字，这些定义就占了 50,000 到 70,000 个 token</strong>。</p>
+            <p>Uber 受 Cloudflare 的 Code Mode 启发，把这些流程移进工具脚本，由脚本通过网关调工具，agent 只读结果里它需要的部分。他们还<strong>禁止在技能和插件里使用 <code>.mcp.json</code></strong>。另外几条降本手段也都有前后数据：技能放到更便宜的模型上跑，单次调用成本降了 46%；技能加载时就跑脚本省掉一轮，降了 32%；花费最高的 20 个会话里，通知轮次约占三分之一的花费，于是把轮询挪到了后台。</p>
+
+            <h2>四、Agent 自己报 bug</h2>
+            <p>agent 遇到坏掉的参数、错误的文档、静默失败的命令时，往往能找到变通办法，但会白白烧掉大量 token。Uber 加了一个常开技能 <code>log-papercut</code>，让 agent 把遇到的阻力提交成结构化报告，他们把每份报告叫一个 papercut。报告要写明尝试了什么、预期什么、实际发生了什么、怎样才算修好。</p>
+            <p><strong>三个月里 agent 提交了数千份，已修复数百个。</strong>原文列的几个例子很具体：某个 pull request 技能把提交信息写进共享临时文件，两个并发会话会改到彼此的 PR；部署技能让 agent 传 epoch 秒数，而 API 要的是毫秒。</p>
+
+            <h2>和我自己做的两个仓库对照</h2>
+            <p>我之前做过两个相关的小项目，量级和 Uber 没法比，但对照着看，能看清哪些地方想对了、哪些地方差得远。</p>
+            <div class="cmp-wrap">
+            <table class="cmp">
+                <tr><th>主题</th><th>Uber 的做法</th><th>我的仓库</th><th>差距</th></tr>
+                <tr>
+                    <td>技能演进</td>
+                    <td>先写 spec，工具从 spec 编译出 SKILL.md 和测试 prompt；模型变了就重新编译</td>
+                    <td><a href="https://github.com/bayshier/harness-engineering" target="_blank" rel="noopener">harness-engineering</a>：观察 → 本能 → eval 门控 → 真实 git 提交 → 可回滚</td>
+                    <td>Uber 的单元是「spec」，我的单元是「技能」本身；他们多了一层与模型无关的意图</td>
+                </tr>
+                <tr>
+                    <td>评估</td>
+                    <td>5/80/15 配比、三种干净环境、消融实验、盲评</td>
+                    <td>单测 9 项，覆盖门控和回滚的逻辑是否正确</td>
+                    <td>最大的一块。我验证的是「机制能跑」，没有验证「技能有用」</td>
+                </tr>
+                <tr>
+                    <td>质量检查</td>
+                    <td>Linter：步骤编号、每步一条具体命令并检查结果、必须有错误恢复表</td>
+                    <td><a href="https://github.com/bayshier/android-agent-skills" target="_blank" rel="noopener">android-agent-skills</a>：5 个从真实 Android 项目里蒸馏出的技能</td>
+                    <td>方向一致，但我没有把标准固化成 linter，只是写的时候照着做</td>
+                </tr>
+                <tr>
+                    <td>反馈来源</td>
+                    <td>agent 自报 papercut + 人类评分员 + 被拒 PR 进入评估集</td>
+                    <td>无。技能写完就定型</td>
+                    <td>完全没有闭环</td>
+                </tr>
+            </table>
+            </div>
+            <p class="cmp-hint">← 表格可左右滑动 →</p>
+            <p>诚实地说，我的 harness-engineering 里的自进化循环，验证的是「弱技能会被门控拒绝、好技能会提交」这套机制本身，用的是确定性脚本 agent 和 9 个单测。它证明不了某个技能在真实任务上有没有用。Uber 用消融实验和盲评回答的正是这个问题。</p>
+
+            <h2>如果只带走三条</h2>
+            <ul>
+                <li><strong>用「拿掉它会不会变差」来检验一个技能。</strong>不需要复杂的基础设施，回放几次真实 prompt、找人盲评，就能得到答案。</li>
+                <li><strong>工具一多，定义本身就是成本。</strong>原文的数字是 100 多个工具、五到七万 token。能写进脚本的流程就别让模型每轮重读一遍定义。</li>
+                <li><strong>满分不是好评估。</strong>70% 到 90% 通过率可能更真实。</li>
+            </ul>
+
+            <h2>说明</h2>
+            <p>这是我的解读，不是译文；文中数字均出自原文，建议读原文全文。原文还有几块我没展开：三层技能市场、<code>aifx</code> 如何让一份配置对多种 agent 生效、技能发现、以及成本的具体度量方法。原文同时提到未解决的开放问题是「如何评估很少运行、但很重要、又很难判断的工作流」，并说下一步要做技能的 A/B 测试和按模型编译。</p>
+        </div>
+
+        <div class="article-cta">
+            <a href="https://www.uber.com/us/en/blog/optimizing-ubers-agent-skills/" target="_blank" rel="noopener">读 Uber 原文 ↗</a>
+            <a class="ghost" href="https://github.com/bayshier/harness-engineering" target="_blank" rel="noopener">harness-engineering ↗</a>
+            <a class="ghost" href="https://github.com/bayshier/android-agent-skills" target="_blank" rel="noopener">android-agent-skills ↗</a>
+        </div>
+
+        <footer class="article-foot">
+            原文版权归 Uber Technologies, Inc. 所有，本文为带链接的解读，未转载原文或其图片。<br>
+            Easin's Code Lab · Built with ❤️ &amp; AI · <a href="./" style="color: var(--ink-dim);">easin.l.cd</a>
+        </footer>
+    </main>
+
+    <script src="js/matrix-rain.js"></script>
+</body>
+</html>
